@@ -1,5 +1,42 @@
+module Searchable
+
+    def dfs(target = nil, &prc)
+        raise "Target & proc must be passed in" if [target, prc].none?
+        prc ||= Proc.new { |node| node.value == target }
+
+        return self if prc.call(self)
+
+        self.children.each do |child|
+            result = child.dfs(&prc)
+            if !result.nil?
+                return result 
+            end
+        end
+
+        nil        
+    end
+
+    def bfs(target = nil, &prc)
+        raise "Target & proc must be passed in" if [target, prc].none?
+        prc ||= Proc.new { |node| node.value == target }
+
+        nodes = [self]
+        until nodes.empty?
+        node = nodes.shift
+
+            if prc.call(node)
+                return node 
+            else
+                nodes.concat(node.children)
+            end
+        end
+    end
+    
+end
 
 class PolyTreeNode
+    include Searchable
+
     attr_reader :parent
     attr_accessor :value
     
@@ -7,6 +44,7 @@ class PolyTreeNode
         @value = value
         @parent = nil
         @children = []
+  
     end
 
     def children
@@ -38,16 +76,8 @@ class PolyTreeNode
             child.parent = nil
         end
     end
+
 end
 
 
-class Searchable
-    def dfs
-    
-    end
-    
-    
-    
-    
-    
-end
+
